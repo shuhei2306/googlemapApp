@@ -1,28 +1,62 @@
 package com.example.shuhei.googlemap;
 
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-
-
-public class MapsActivity extends FragmentActivity{
+public class MapsActivity extends FragmentActivity
+        implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     public GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public GoogleMap mMap2;
-   // private LocationClient locationClient;
+
+    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+    private LatLng mKansai = new LatLng(34.435912, 135.243496);
+    private LatLng mItami = new LatLng(34.785500, 135.438004);
+    private LatLng hankyurokkou = new LatLng(34.71985,135.234388);
+
+    private GoogleApiClient mLocationClient = null;
+    private static final LocationRequest REQUEST = LocationRequest.create()
+            .setInterval(5000)
+            .setFastestInterval(16)
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+
+        mLocationClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        if(mLocationClient != null){
+            Log.d("testdesu", "d");
+
+            mLocationClient.connect();
+            Log.d("testdesu", "e");
+        }
 
     }
 
@@ -32,6 +66,7 @@ public class MapsActivity extends FragmentActivity{
         super.onResume();
         setUpMapIfNeeded();
 
+        //thread
       //  (new Thread(new Task())).start();
 
 
@@ -55,7 +90,7 @@ public class MapsActivity extends FragmentActivity{
      */
     private void setUpMapIfNeeded() {
 
-        Log.d("testdesu", "1010");
+       // Log.d("testdesu", "1010");
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
@@ -112,6 +147,59 @@ public class MapsActivity extends FragmentActivity{
     }
 
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d("testdesu", "coonect");
+        fusedLocationProviderApi.requestLocationUpdates(mLocationClient, REQUEST, (com.google.android.gms.location.LocationListener) this);
+        Log.d("testdesu", "connected");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("testdesu", "a");
+
+        CameraPosition cameraPos = new CameraPosition.Builder()
+                .target(new LatLng(location.getLatitude(),location.getLongitude())).zoom(17.0f)
+                .bearing(0).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+
+        //マーカー設定
+        MarkerOptions options = new MarkerOptions();
+        Intent intent = getIntent();
+        String selectedA = intent.getStringExtra("SELECTED_ITEM");
+        if(selectedA !=null && selectedA.equals("関西国際空港")){
+            options.position(mKansai);
+            mMap.addMarker(options);
+        }else if(selectedA !=null && selectedA.equals("伊丹空港")){
+            options.position(mItami);
+            mMap.addMarker(options);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }
 
 
