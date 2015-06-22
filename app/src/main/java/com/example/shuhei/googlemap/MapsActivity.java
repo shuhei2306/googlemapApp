@@ -1,6 +1,5 @@
 package com.example.shuhei.googlemap;
 
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -18,7 +17,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 //import android.location.LocationListener;
 
@@ -253,7 +251,7 @@ public class MapsActivity extends FragmentActivity
                     Log.d("Altitude=" + String.valueOf(location.getAltitude()) + "\n", "testdesu");
                     Log.d("Time="+ String.valueOf(location.getTime())+"\n", "testdesu");
                     Log.d("Speed=" + String.valueOf(location.getSpeed()) + "\n", "testdesu");
-                    Log.d("Bearing=" + String.valueOf(location.getBearing())+"\n", "testdesu");
+                    Log.d("Bearing=" + String.valueOf(location.getBearing()) + "\n", "testdesu");
 
     }
 
@@ -297,12 +295,17 @@ public class MapsActivity extends FragmentActivity
     public void onLocationChanged(Location location) {
         Log.d("testdesu", "a");
 
+
         CameraPosition cameraPos = new CameraPosition.Builder()
-                .target(new LatLng(location.getLatitude(),location.getLongitude())).zoom(17.0f)
+                .target(new LatLng(location.getLatitude(),location.getLongitude())).zoom(mMap.getCameraPosition().zoom)
                 .bearing(0).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
 
+
+        mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(hankyurokkou, mMap.getCameraPosition().zoom));
+
         //マーカー設定
+        /*
         MarkerOptions options = new MarkerOptions();
         Intent intent = getIntent();
         String selectedA = intent.getStringExtra("SELECTED_ITEM");
@@ -313,6 +316,8 @@ public class MapsActivity extends FragmentActivity
             options.position(mItami);
             mMap.addMarker(options);
         }
+
+        */
     }
 
     @Override
