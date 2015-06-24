@@ -2,6 +2,7 @@ package com.example.shuhei.googlemap;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ public class MapsActivity extends FragmentActivity
 
     public GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public GoogleMap mMap2;
+    //public GoogleMap mMap3;
 
     private boolean mResolvingError = false;
     private LatLng mKansai = new LatLng(34.435912, 135.243496);
@@ -64,14 +66,12 @@ public class MapsActivity extends FragmentActivity
                 .addOnConnectionFailedListener(this)
                 .build();
 
-
         if(mLocationClient != null){
             Log.d("testdesu", "d");
 
             mLocationClient.connect();
             Log.d("testdesu", "e");
         }
-
 
     }
 
@@ -87,6 +87,12 @@ public class MapsActivity extends FragmentActivity
         Log.d("onCreate()¥n", "testdesu");
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+        fragment.getView().setAlpha(0.5f);
+    }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
@@ -111,6 +117,8 @@ public class MapsActivity extends FragmentActivity
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            //Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map2);
+            //fragment.getView().setAlpha(0.2f);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -122,6 +130,8 @@ public class MapsActivity extends FragmentActivity
             // Try to obtain the map from the SupportMapFragment.
             mMap2 = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map2))
                     .getMap();
+            //Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map2);
+            //fragment.getView().setAlpha(0.2f);
             // Check if we were successful in obtaining the map.
             if (mMap2 != null) {
                 setUpMap2();
@@ -142,7 +152,6 @@ public class MapsActivity extends FragmentActivity
         float zoom = 13; // 2.0～21.0
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-
     }
     private void setUpMap2() {
        // mMap2.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
@@ -151,7 +160,6 @@ public class MapsActivity extends FragmentActivity
         LatLng latLng = new LatLng(34.71985,135.234388);
         float zoom = 13; // 2.0～21.0
         mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-
         // マーカー設置
         //mMap2.addMarker(new MarkerOptions().position(latLng).title("皇居"));
     }
@@ -159,7 +167,6 @@ public class MapsActivity extends FragmentActivity
     public void plus(View v) {
         LatLng latLng = new LatLng(34.71985,135.234388);
         mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
-
     }
 
     /*
