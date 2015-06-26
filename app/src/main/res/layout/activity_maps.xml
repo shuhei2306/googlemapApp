@@ -35,13 +35,25 @@
         android:orientation="horizontal">
         <Button
         android:id="@+id/button"
-        android:layout_width="180dp"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:onClick="changeLayout"
-        android:text="changeLayout" />
+        android:text="2display" />
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:onClick="showMap1"
+            android:text="Map1" />
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:onClick="showMap2"
+            android:text="Map2" />
         <Button
             android:id="@+id/button2"
-            android:layout_width="180dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:onClick="setZoom"
             android:text="setZoom" />
