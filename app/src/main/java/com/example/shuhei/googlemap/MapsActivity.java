@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,6 +30,8 @@ public class MapsActivity extends FragmentActivity
     // GoogleApiClient.ConnectionCallbacks をConnectionCallbacksだけにすると
     // べつのクラスが呼ばれてGoogleApiClient.Builderでエラーになる
 
+    SeekBar seekBar;
+
     public GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public GoogleMap mMap2;
     //public GoogleMap mMap3;
@@ -41,7 +44,10 @@ public class MapsActivity extends FragmentActivity
     private GoogleApiClient mLocationClient = null;
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     private LocationRequest locationRequest;
-    private Location location;
+
+    public boolean sw = false;
+    public boolean firstset = false;
+
 /*
     private static final LocationRequest REQUEST = LocationRequest.create()
             .setInterval(5000)
@@ -73,6 +79,27 @@ public class MapsActivity extends FragmentActivity
             Log.d("testdesu", "e");
         }
 
+        seekBar = (SeekBar)findViewById(R.id.SeekBar01);
+
+        seekBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar,
+                                                  int progress, boolean fromUser) {
+                        // ツマミをドラッグしたときに呼ばれる
+                        //tv1.setText("Current Value:"+progress);
+                        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+                        fragment.getView().setAlpha((float)seekBar.getProgress()/(float)10.0);
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // ツマミに触れたときに呼ばれる
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        // ツマミを離したときに呼ばれる
+                    }
+                }
+        );
     }
 
 
@@ -91,7 +118,8 @@ public class MapsActivity extends FragmentActivity
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
-        fragment.getView().setAlpha(0.5f);
+        fragment.getView().setAlpha((float)seekBar.getProgress()/(float)10);
+
     }
 
     /**
@@ -164,9 +192,40 @@ public class MapsActivity extends FragmentActivity
         //mMap2.addMarker(new MarkerOptions().position(latLng).title("皇居"));
     }
 
-    public void plus(View v) {
+    public void changeLayout(View v) {
+        if(sw == false) {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+            fragment.getView().setAlpha((float) 1.0);
+
+            Fragment fragment2 = getSupportFragmentManager().findFragmentById(R.id.map2);
+
+            fragment.getView().setTop(544);
+            fragment.getView().setBottom(1088);
+            fragment2.getView().setBottom(0);
+            fragment2.getView().setBottom(544);
+
+            sw=true;
+        }
+        else {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+            fragment.getView().setAlpha((float)seekBar.getProgress()/(float)10.0);
+
+            Fragment fragment2 = getSupportFragmentManager().findFragmentById(R.id.map2);
+
+            fragment.getView().setTop(0);
+            fragment.getView().setBottom(1088);
+            fragment2.getView().setTop(0);
+            fragment2.getView().setBottom(1088);
+
+            sw=false;
+        }
+        /*
         LatLng latLng = new LatLng(34.71985,135.234388);
         mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
+        */
+    }
+    public void setZoom(View v) {
+        mMap2.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom));
     }
 
     /*
@@ -300,16 +359,24 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("testdesu", "a");
+       // Log.d("testdesu", "a");
 
 
-        CameraPosition cameraPos = new CameraPosition.Builder()
-                .target(new LatLng(location.getLatitude(),location.getLongitude())).zoom(mMap.getCameraPosition().zoom)
-                .bearing(0).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+        if(firstset == false) {
+            CameraPosition cameraPos = new CameraPosition.Builder()
+                    .target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom)
+                    .bearing(0).build();
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
 
+            firstset=true;
+        }
+        else
+        {
+           // mMap2.animateCamera(CameraUpdateFactory.zoomBy(mMap.getCameraPosition().zoom));
+        }
 
-        mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(hankyurokkou, mMap.getCameraPosition().zoom));
+        mMap2.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom));
+        //mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(hankyurokkou, mMap.getCameraPosition().zoom));
 
         //マーカー設定
         /*
@@ -348,7 +415,6 @@ class Task implements Runnable {
            sleep(1000);
 
         }
-
 
     }
 
